@@ -1,5 +1,5 @@
 #include "fighter.h"
-
+// Dinh vlllll ụa là sao đây
 // ======================== Skill Methods ========================
 bool Skill::CanUse(Fighter& user, Fighter& opponent) {
     if (user.currMANA < manaCost) {

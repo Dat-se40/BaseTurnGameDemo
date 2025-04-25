@@ -3,6 +3,8 @@
 #include<iostream>
 #include<functional>
 #include <string>
+#include <vector>
+#include <unordered_map>
 using namespace std ; 
 
 class Character{
@@ -15,6 +17,7 @@ protected:
     //se them speed 
     vector<Skill> skills;
     vector<Effect> EffectCarrying;
+    unordered_map<string,vector<function<void(Character& user, Character& opponent,float)>>> eventHandle;
 public: 
     Character() ; 
     Character(float h , float a , float d, float m, string n  ) ;
@@ -37,7 +40,7 @@ public:
 
     friend class Effect ; 
     void AddEffect( Effect newEffect);
-    
+
 };
 
 class Caster : public Character{
@@ -47,4 +50,8 @@ public:
 class Lancer : public Character{
 public : 
     Lancer() ; 
+};
+class Beast : public Character{
+public :
+    Beast() ;
 };

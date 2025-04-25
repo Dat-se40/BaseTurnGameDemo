@@ -80,7 +80,7 @@ Effect::Effect(string n, int cd, int NA,
                vector<function<void(Character &, Character &)>> imt) : name(n), coolDown(cd), number_Activations(NA), impact(imt) {}
 bool Effect::isVail()
 {
-    return coolDown.GetCurrVal() > 0;
+    return coolDown.GetCurrVal() > 0 || number_Activations.GetCurrVal() == 0 ;
 }
 void Effect::Act(Character &source, Character &destination)
 {
@@ -97,7 +97,9 @@ void Effect::Act(Character &source, Character &destination)
     coolDown.Decrease(1);
     number_Activations.Decrease(1);
 }
-
+Stat& Effect::GetNumberActivation() {
+    return number_Activations;
+}
 // ===== Buff ====== //
 Buff::Buff(string n, int cd, int NA,
            vector<function<void(Character &, Character &)>> imt)
@@ -134,4 +136,15 @@ void Debuff::Act(Character &taken, Character &source)
     // Giảm thời gian tồn tại
     coolDown.Decrease(1);
     number_Activations.Decrease(1);
+}
+// Trigger Effect 
+TriggerEffect::TriggerEffect(string n ,
+    vector<function<bool(Character&)>> condi ,
+    vector<function<void(Character& , Character&) >> imt )
+    : Effect(n,99,1,imt) , condition(condi) {}
+bool TriggerEffect::reset(){
+    return hasTrigger ; 
+}
+void  TriggerEffect::SetHasTrigger(bool wanted){
+    hasTrigger = wanted ; 
 }

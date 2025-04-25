@@ -68,7 +68,10 @@ void Character::UpdateStatus(Character& user , Character & opponnet){
     // Cập nhật danh sách hiệu ứng
     EffectCarrying = activeEffects;
 }
-void Character::AddEffect( Effect newEffect){ EffectCarrying.push_back( newEffect) ; }
+void Character::AddEffect(Effect newEffect){
+    EffectCarrying.push_back(newEffect) ;
+}
+
 // ===== Caster ====== ///
 Caster::Caster() : Character(50,10,3,20,"Caster") {
     this->skills[0].effect.push_back(
@@ -120,11 +123,11 @@ Lancer::Lancer() : Character(55,11,4,15,"Lancer"){
 
     this->AddSkill( Skill("Concentrate",5,2,
         {
-            [](Character& user , Character& opponnet){
+            [](Character& user , Character& opponent){
                 return true ;
             }
         },{// Thay mac gom =))
-            [](Character& user , Character& opponnet){
+            [](Character& user , Character& opponent){
                 user.AddEffect( Buff("Charisma",3,2,{
                     [](Character& source, Character& destination){
                         Stat& increment = source.GetATKStat() ; 
@@ -132,11 +135,12 @@ Lancer::Lancer() : Character(55,11,4,15,"Lancer"){
                     }
                 }));
             },
-            [](Character& user, Character& opponnet){
+            [](Character& user, Character& opponent){
                 user.AddEffect(Buff("Counter",3,1,{
                     [](Character& source, Character& destination){
                         Stat& target = source.GetHPStat() ; 
                         if (target.GetCurrVal() < target.GetMaxVal() ){
+                            cout<<source.GetName()<<" counter attack to "<<source.GetName()<<endl; 
                             destination.TakenDamange( source.GetATKStat().GetCurrVal()*0.3);
                         }
                     }
@@ -146,3 +150,47 @@ Lancer::Lancer() : Character(55,11,4,15,"Lancer"){
         }
     ));
 }  
+// ===== Beast ===== //
+Beast::Beast(): Character(80,4,2,20,"Beast of Disire") {
+    this->AddSkill( Skill("Hate Spike",0,0,
+        {
+            [](Character& user , Character& opponent){
+                return true ;
+            }
+        },{
+            [](Character& user , Character& opponent){
+                float damage = user.GetATKStat().GetCurrVal() ; 
+                opponent.TakenDamange(damage);
+            }
+        }
+    ));
+    this->AddSkill( Skill("Allure",5,3,
+    {
+        [](Character& user , Character& opponent){
+            return true ;
+        }
+    },{
+        [](Character& user , Character& opponent){
+            opponent.AddEffect(Debuff("Burn",3,3,{//impt
+                [](Character& taken, Character& source){
+                    taken.GetDEFStat().Decrease(taken.GetDEFStat().GetCurrVal()*0.8);
+                }
+            }));
+        }
+    }));
+    //Passive 
+    this->AddEffect( TriggerEffect(
+        "Molt",
+        {
+            [](Character& user )->bool{
+                return user.GetHPStat().GetCurrVal() < user.GetHPStat().GetMaxVal()*0.5 ;
+            },
+        },{
+            [](Character& user, Character& opponent){
+                cout<<user.GetName()<<"'s HP: "<<user.GetHPStat().GetCurrVal()<<"\n";
+                user.GetATKStat().Increase(opponent.GetATKStat().GetCurrVal()*0.4);
+                user.UseSkill(1,opponent);
+            }
+        }
+    ));
+}

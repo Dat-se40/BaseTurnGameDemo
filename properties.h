@@ -1,6 +1,8 @@
 #pragma once
 #include<iostream>
 #include<functional>
+#include <vector>
+#include <unordered_map>
 
 using namespace std ; 
 
@@ -55,6 +57,7 @@ public :
     bool isVail() ; 
     // Kiểu người gây(source) ra người hứng chịu(destination)
     virtual void Act(Character& source , Character& destination)   ; 
+    Stat& GetNumberActivation() ; 
    
 };
 
@@ -74,3 +77,17 @@ public:
         ) ;
     void Act(Character& taken , Character& source) override;
 } ; 
+
+class TriggerEffect : public Effect{
+private:  
+    bool hasTrigger = false; 
+    vector<function<bool(Character&)>>  condition; 
+public : 
+    TriggerEffect(string n ,
+            vector<function<bool(Character&)>> condi ,
+            vector<function<void(Character& , Character&) >> imt 
+    ) ;
+    bool reset();
+    void Act(Character& source, Character& destination) override {};
+    void SetHasTrigger(bool wanted);
+};
